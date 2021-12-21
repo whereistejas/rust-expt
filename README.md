@@ -1,0 +1,2 @@
+## What is this repository?
+This repository is a dump of all the many experiments I do in rust with new libraries and what not. I don't promise that all of them will be finished and fleshed out. But, for better or for worse, here they are.
