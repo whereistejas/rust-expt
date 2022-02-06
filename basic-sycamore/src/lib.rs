@@ -103,4 +103,6 @@ pub fn run_app() {
         ]),
     };
     sycamore::render(|| component::<_, MyRadiobutton<_>>(info));
+
+    sycamore::render(|| div().attr("class", "class1 class2").build());
 }
