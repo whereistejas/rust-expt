@@ -1,5 +1,13 @@
 use std::cmp::Ordering;
 
+fn natual_cmp(a: &str, b: &str) -> Ordering {
+    todo!()
+}
+
+fn split_string(string: &str) -> Vec<&str> {
+    todo!()
+}
+
 // pub fn natual_cmp(a: &str, b: &str) -> Ordering {
 //     let pieces_a = str_to_pieces(a);
 //     let pieces_b = str_to_pieces(b);
@@ -102,90 +110,99 @@ use std::cmp::Ordering;
 
 #[cfg(test)]
 mod tests {
-    use super::{str_to_pieces, Pieces};
+    use super::split_string;
 
     #[test]
-    fn test_splitting_pieces() {
-        let value = "z22";
-        let result = str_to_pieces(value);
+    fn test_split_string() {
+        let input = "abc2.0def";
 
-        assert_eq!(result, vec![Pieces::Chars("z"), Pieces::Digits(22.)])
+        assert_eq!(split_string(input), vec!["abc", "2.0", "def"])
     }
 
-    #[test]
-    fn test_splitting_pieces_decimals() {
-        let value = "z22.676";
-        let result = str_to_pieces(value);
+    // use super::{str_to_pieces, Pieces};
 
-        assert_eq!(result, vec![Pieces::Chars("z"), Pieces::Digits(22.676)])
-    }
+    // #[test]
+    // fn test_splitting_pieces() {
+    //     let value = "z22";
+    //     let result = str_to_pieces(value);
 
-    #[test]
-    fn test_numbers_decimals() {
-        let mut list = vec![
-            Pieces::Digits(1.1),
-            Pieces::Digits(4.2),
-            Pieces::Digits(4.1),
-            Pieces::Digits(4.2),
-            Pieces::Digits(0.2),
-        ];
+    //     assert_eq!(result, vec![Pieces::Chars("z"), Pieces::Digits(22.)])
+    // }
 
-        list.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        assert_eq!(
-            list,
-            vec![
-                Pieces::Digits(0.2),
-                Pieces::Digits(1.1),
-                Pieces::Digits(4.1),
-                Pieces::Digits(4.2),
-                Pieces::Digits(4.2),
-            ]
-        )
-    }
+    // #[test]
+    // fn test_splitting_pieces_decimals() {
+    //     let value = "z22.676";
+    //     let result = str_to_pieces(value);
 
-    #[test]
-    fn test_numbers() {
-        let mut list = vec![
-            Pieces::Digits(1.),
-            Pieces::Digits(2.),
-            Pieces::Digits(8.),
-            Pieces::Digits(4.),
-            Pieces::Digits(0.),
-        ];
+    //     assert_eq!(result, vec![Pieces::Chars("z"), Pieces::Digits(22.676)])
+    // }
 
-        list.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        assert_eq!(
-            list,
-            vec![
-                Pieces::Digits(0.),
-                Pieces::Digits(1.),
-                Pieces::Digits(2.),
-                Pieces::Digits(4.),
-                Pieces::Digits(8.),
-            ]
-        )
-    }
+    // #[test]
+    // fn test_numbers_decimals() {
+    //     let mut list = vec![
+    //         Pieces::Digits(1.1),
+    //         Pieces::Digits(4.2),
+    //         Pieces::Digits(4.1),
+    //         Pieces::Digits(4.2),
+    //         Pieces::Digits(0.2),
+    //     ];
 
-    #[test]
-    fn test_strings() {
-        let mut list = vec![
-            Pieces::Chars("1"),
-            Pieces::Chars("2"),
-            Pieces::Chars("8"),
-            Pieces::Chars("4"),
-            Pieces::Chars("0"),
-        ];
+    //     list.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    //     assert_eq!(
+    //         list,
+    //         vec![
+    //             Pieces::Digits(0.2),
+    //             Pieces::Digits(1.1),
+    //             Pieces::Digits(4.1),
+    //             Pieces::Digits(4.2),
+    //             Pieces::Digits(4.2),
+    //         ]
+    //     )
+    // }
 
-        list.sort_by(|a, b| a.partial_cmp(b).unwrap());
-        assert_eq!(
-            list,
-            vec![
-                Pieces::Chars("0"),
-                Pieces::Chars("1"),
-                Pieces::Chars("2"),
-                Pieces::Chars("4"),
-                Pieces::Chars("8"),
-            ]
-        )
-    }
+    // #[test]
+    // fn test_numbers() {
+    //     let mut list = vec![
+    //         Pieces::Digits(1.),
+    //         Pieces::Digits(2.),
+    //         Pieces::Digits(8.),
+    //         Pieces::Digits(4.),
+    //         Pieces::Digits(0.),
+    //     ];
+
+    //     list.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    //     assert_eq!(
+    //         list,
+    //         vec![
+    //             Pieces::Digits(0.),
+    //             Pieces::Digits(1.),
+    //             Pieces::Digits(2.),
+    //             Pieces::Digits(4.),
+    //             Pieces::Digits(8.),
+    //         ]
+    //     )
+    // }
+
+    // #[test]
+    // fn test_strings() {
+    //     let mut list = vec![
+    //         Pieces::Chars("1"),
+    //         Pieces::Chars("2"),
+    //         Pieces::Chars("8"),
+    //         Pieces::Chars("4"),
+    //         Pieces::Chars("0"),
+    //     ];
+
+    //     list.sort_by(|a, b| a.partial_cmp(b).unwrap());
+    //     assert_eq!(
+    //         list,
+    //         vec![
+    //             Pieces::Chars("0"),
+    //             Pieces::Chars("1"),
+    //             Pieces::Chars("2"),
+    //             Pieces::Chars("4"),
+    //             Pieces::Chars("8"),
+    //         ]
+    //     )
+    // }
 }
