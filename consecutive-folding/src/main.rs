@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 #[derive(Debug)]
 enum Type {
     A(String),
@@ -5,6 +7,35 @@ enum Type {
 }
 
 fn main() {
+    let one = "1".to_string();
+    let two = "2".to_string();
+
+    let list = vec![
+        Type::A(one.clone()),
+        Type::A(one.clone()),
+        Type::A(one.clone()),
+        Type::B(two.clone()),
+        Type::B(two.clone()),
+        Type::B(two.clone()),
+        Type::A(one),
+        Type::B(two),
+    ];
+
+    let list = list
+        .into_iter()
+        .coalesce(|x, y| match (x, y) {
+            (Type::A(a1), Type::A(a2)) => Ok(Type::A(format!("{a1}{a2}"))),
+            (Type::B(b1), Type::B(b2)) => Ok(Type::B(format!("{b1}{b2}"))),
+            (a @ Type::A(..), b @ Type::B(..)) => Err((a, b)),
+            (b @ Type::B(..), a @ Type::A(..)) => Err((b, a)),
+        })
+        .collect::<Vec<Type>>();
+
+    println!("{list:?}")
+}
+
+// without iterators
+fn main_ver1() {
     let one = "1".to_string();
     let two = "2".to_string();
 
@@ -53,4 +84,5 @@ fn main() {
     }
 
     println!("{agg_list:?}")
+    // result: [A("111"), B("222"), A("1")]
 }
