@@ -1,9 +1,0 @@
----
-? field: batman
-: - items: joker
-  - items: superman
-  - items: nam nam
-? field: tom
-: - items: jerry
-  - items: mouse
-  - items: cat

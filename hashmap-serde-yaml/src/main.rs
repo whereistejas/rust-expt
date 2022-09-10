@@ -48,5 +48,32 @@ fn main() {
         ],
     );
 
-    std::fs::write("some.yaml", &serde_yaml::to_string(&map).unwrap()).unwrap();
+    std::fs::write("hashmap.yaml", &serde_yaml::to_string(&map).unwrap()).unwrap();
+
+    let category = Category {
+        name: "".to_string(),
+        icon: "".to_string(),
+        description: "".to_string(),
+        render_as: SectionOrModal::Modal,
+    };
+
+    std::fs::write(
+        "enuminstruct.yaml",
+        &serde_yaml::to_string(&category).unwrap(),
+    )
+    .unwrap();
+}
+
+#[derive(Serialize)]
+struct Category {
+    name: String,
+    icon: String,
+    description: String,
+    render_as: SectionOrModal,
+}
+
+#[derive(Serialize)]
+enum SectionOrModal {
+    Section,
+    Modal,
 }
