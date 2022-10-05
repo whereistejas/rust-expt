@@ -5,42 +5,38 @@ use bollard::container::{
 use bollard::image::{CreateImageOptions, ListImagesOptions};
 use bollard::Docker;
 
+use bollard::service::ImageSummary;
 use futures::StreamExt;
 use std::collections::HashMap;
 use std::default::Default;
 
+async fn pull_image(image_name: &str) -> Result<(), bollard::errors::Error> {
+    let docker = Docker::connect_with_local_defaults().unwrap();
+
+    let pull_options = CreateImageOptions {
+        from_image: image_name,
+        ..Default::default()
+    };
+    let mut response = docker.create_image(Some(pull_options), None, None);
+
+    while let Some(output) = response.next().await {
+        println!("{:?}", output?);
+    }
+
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() {
     let docker = Docker::connect_with_local_defaults().unwrap();
-    let mut images = Vec::new();
 
-    let pull_options = Some(CreateImageOptions {
-        from_image: "airbyte/source-amazon-ads:0.1.19",
-        ..Default::default()
-    });
-    let mut response = docker.create_image(pull_options, None, None);
-
-    for result in response.next().await {
-        match result {
-            Ok(_) => break,
-            Err(_) => continue,
-        }
-    }
-
-    let config = Config {
-        cmd: Some(vec!["spec"]),
-        image: Some("airbyte/source-amazon-ads:0.1.19"),
-        ..Default::default()
-    };
-
-    let create_options = Some(CreateContainerOptions {
-        name: "some-container",
-    });
+    let image_name = "airbyte/source-amazon-ads:0.1.20";
+    let name = format!("test-container-{}", rand::random::<u32>());
 
     let mut filters = HashMap::new();
-    filters.insert("reference", vec!["airbyte/source-amazon-ads:0.1.19"]);
+    filters.insert("reference", vec![image_name]);
 
-    images = docker
+    let mut images_list = docker
         .list_images(Some(ListImagesOptions {
             filters: filters.clone(),
             ..Default::default()
@@ -48,8 +44,21 @@ async fn main() {
         .await
         .unwrap();
 
-    while images.is_empty() {
-        images = docker
+    let is_image_present = |images: &Vec<ImageSummary>, image_name: &str| -> bool {
+        images
+            .iter()
+            .any(|image| image.repo_tags.iter().any(|tag| tag == image_name))
+    };
+
+    let mut download_image = true;
+    while !is_image_present(&images_list, image_name) || images_list.is_empty() {
+        println!("Image is not present. Pulling image...");
+        if download_image {
+            pull_image(image_name).await.unwrap();
+            download_image = false;
+        }
+
+        images_list = docker
             .list_images(Some(ListImagesOptions {
                 filters: filters.clone(),
                 ..Default::default()
@@ -58,27 +67,37 @@ async fn main() {
             .unwrap();
     }
 
+    let config = Config {
+        cmd: Some(vec!["spec"]),
+        image: Some(image_name),
+        ..Default::default()
+    };
+
+    let create_options = CreateContainerOptions {
+        name: name.as_str(),
+    };
+
     let _response = docker
-        .create_container(create_options, config)
+        .create_container(Some(create_options), config)
         .await
         .unwrap();
 
-    let attach_options = Some(AttachContainerOptions::<String> {
+    let attach_options = AttachContainerOptions::<String> {
         stdin: Some(true),
         stdout: Some(true),
         stderr: Some(true),
         stream: Some(true),
         logs: Some(true),
         ..Default::default()
-    });
+    };
 
-    let AttachContainerResults { mut output, input } = docker
-        .attach_container("some-container", attach_options)
+    let AttachContainerResults { mut output, .. } = docker
+        .attach_container(&name, Some(attach_options))
         .await
         .unwrap();
 
     docker
-        .start_container("some-container", None::<StartContainerOptions<String>>)
+        .start_container(&name, None::<StartContainerOptions<String>>)
         .await
         .unwrap();
 
@@ -93,11 +112,9 @@ async fn main() {
         }
     }
 
-    let remove_options = Some(RemoveContainerOptions {
+    let remove_options = RemoveContainerOptions {
         force: true,
         ..Default::default()
-    });
-    let _ = docker
-        .remove_container("some-container", remove_options)
-        .await;
+    };
+    let _ = docker.remove_container(&name, Some(remove_options)).await;
 }
